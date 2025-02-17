@@ -17,7 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
-
+$conn->set_charset("utf8mb4");
 // Obtener los datos del usuario actual
 $sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE nombre = '" . $_SESSION['usuario'] . "' LIMIT 1";
 $resultUsuario = $conn->query($sqlUsuario);
@@ -173,9 +173,8 @@ $conn->close();
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid"><?php
-
-
 // Verificar si el usuario ha iniciado sesión
+
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
     exit();
@@ -191,6 +190,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
+$conn->set_charset("utf8mb4");
 
 // Obtener el id y tipo de la URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -297,16 +297,6 @@ $conn->close();
             font-size: 1.1em;
             color: #495057;
         }
-        .list-group-item {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .list-group-item:hover {
-            background-color: #f1f3f5;
-            transform: scale(1.02);
-        }
     </style>
 </head>
 <body>
@@ -333,17 +323,47 @@ $conn->close();
                 </nav>
 
                 <h2>Descripción de <?php echo htmlspecialchars($descripcion['item_nombre']); ?></h2>
-                <div class="card">
+                <div id="descripcion-container" class="card">
                     <div class="card-body">
-                        <p><?php echo nl2br(htmlspecialchars($descripcion['descripcion'])); ?></p>
+                        <p id="descripcion-texto"><?php echo nl2br(htmlspecialchars($descripcion['descripcion'])); ?></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        // Función para hacer la solicitud de los datos de manera asíncrona
+        async function cargarDescripcion(id, tipo) {
+            try {
+                let response = await fetch(`descripcion_ajax.php?id=${id}&tipo=${tipo}`);
+                if (!response.ok) throw new Error('Error al cargar los datos');
+                
+                let data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
+                    alert('Hubo un problema al obtener la descripción.');
+                    return;
+                }
+
+                // Actualizar el DOM con los datos obtenidos
+                document.getElementById('descripcion-texto').innerHTML = data.descripcion;
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+            }
+        }
+
+        // Cargar la descripción al iniciar la página
+        window.onload = () => {
+            let id = <?php echo $id; ?>;
+            let tipo = "<?php echo $tipo; ?>";
+            cargarDescripcion(id, tipo);
+        };
+    </script>
+
 </body>
 </html>
+
 </main>
         </div>
     </div>

@@ -17,7 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
-
+$conn->set_charset("utf8mb4");
 // Obtener los datos del usuario actual
 $sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE nombre = '" . $_SESSION['usuario'] . "' LIMIT 1";
 $resultUsuario = $conn->query($sqlUsuario);
@@ -192,7 +192,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
-
+$conn->set_charset("utf8mb4");
 // Obtener el usuario_id de la URL
 $usuario_id = isset($_GET['usuario_id']) ? (int)$_GET['usuario_id'] : 0;
 

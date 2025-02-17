@@ -17,7 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
-
+$conn->set_charset("utf8mb4");
 // Obtener los datos del usuario actual
 $sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE nombre = '" . $_SESSION['usuario'] . "' LIMIT 1";
 $resultUsuario = $conn->query($sqlUsuario);
@@ -173,10 +173,9 @@ $conn->close();
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid">
-<?php
-
-
+                <?php
 // Verificar si el usuario ha iniciado sesión
+
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
     exit();
@@ -192,6 +191,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
+$conn->set_charset("utf8mb4");
 
 // Obtener el usuario_id y tipo de la URL
 $usuario_id = isset($_GET['usuario_id']) ? (int)$_GET['usuario_id'] : 0;
@@ -228,10 +228,6 @@ switch ($tipo) {
         echo "Tipo de entidad desconocido.";
         exit();
 }
-
-// Consultar elementos del usuario
-$sql = "SELECT $columna_id, nombre FROM $tabla WHERE $columna_id IN (SELECT $columna_id FROM accesos WHERE usuario_id = $usuario_id)";
-$result = $conn->query($sql);
 
 $conn->close();
 ?>
@@ -316,25 +312,61 @@ $conn->close();
 
                 <h2><?php echo $titulo; ?> de <?php echo htmlspecialchars($nombre_usuario); ?></h2>
 
-                <?php if ($result->num_rows > 0): ?>
-                    <ul class="list-group">
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <li class="list-group-item">
-                                <a href="descripcion.php?id=<?php echo $row[$columna_id]; ?>&tipo=<?php echo $tipo; ?>">
-                                    <?php echo htmlspecialchars($row['nombre']); ?>
-                                </a>
-                            </li>
-                        <?php endwhile; ?>
-                    </ul>
-                <?php else: ?>
-                    <p>No hay <?php echo strtolower($titulo); ?> disponibles.</p>
-                <?php endif; ?>
+                <ul class="list-group" id="lista-elementos">
+                    <!-- Los elementos se cargarán aquí -->
+                </ul>
+
             </div>
         </div>
     </div>
 
+    <script>
+        // Función para cargar los elementos de manera asíncrona
+        async function cargarElementos() {
+            try {
+                const usuarioId = <?php echo $usuario_id; ?>;
+                const tipo = "<?php echo $tipo; ?>";
+
+                // Hacer la solicitud fetch al servidor para obtener los elementos
+                const response = await fetch(`lista_ajax.php?usuario_id=${usuarioId}&tipo=${tipo}`);
+                if (!response.ok) throw new Error('Error al cargar los datos');
+
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+
+                // Obtener el contenedor de la lista
+                const listaElementos = document.getElementById('lista-elementos');
+
+                // Si no hay datos, mostrar mensaje
+                if (data.elementos.length === 0) {
+                    listaElementos.innerHTML = "<p>No hay elementos disponibles.</p>";
+                    return;
+                }
+
+                // Crear los elementos de la lista
+                listaElementos.innerHTML = "";
+                data.elementos.forEach(item => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.innerHTML = `<a href="descripcion.php?id=${item.id}&tipo=${tipo}">${item.nombre}</a>`;
+                    listaElementos.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                alert('Hubo un problema al obtener los datos.');
+            }
+        }
+
+        // Cargar los elementos cuando la página haya cargado
+        window.onload = cargarElementos;
+    </script>
+
 </body>
 </html>
+
 </main>
         </div>
     </div>

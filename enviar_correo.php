@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
 
     // Verificar si el correo existe en la base de datos
-    $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+    $stmt = $conn->prepare("SELECT usuario_id FROM usuarios WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();

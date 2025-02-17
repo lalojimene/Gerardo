@@ -8,7 +8,7 @@ if (!isset($_GET["token"])) {
 $token = $_GET["token"];
 
 // Verificar si el token es válido
-$stmt = $conn->prepare("SELECT id FROM usuarios WHERE token = ? AND token_expira > NOW()");
+$stmt = $conn->prepare("SELECT usuario_id FROM usuarios WHERE token = ? AND token_expira > NOW()");
 $stmt->bind_param("s", $token);
 $stmt->execute();
 $stmt->store_result();
