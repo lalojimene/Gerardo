@@ -173,9 +173,7 @@ $conn->close();
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid">
-<?php
-
-
+                <?php
 // Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
@@ -220,56 +218,82 @@ $conn->close();
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            max-width: 900px;
-            margin-top: 30px;
+            max-width: 1000px;
+            margin-top: 40px;
         }
         .breadcrumb {
-            background-color: #e9ecef;
-            padding: 10px 20px;
+            background-color: #f8f9fa;
+            padding: 15px 25px;
             border-radius: 5px;
         }
         .breadcrumb-item a {
             color: #007bff;
             text-decoration: none;
+            font-weight: 600;
         }
         .breadcrumb-item.active {
             color: #6c757d;
         }
-        h2 {
-            color: #343a40;
+        .carousel-card {
+            background: linear-gradient(135deg, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+            border-radius: 12px;
+            color: white;
+            padding: 30px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .carousel-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        .carousel-card h5 {
+            font-size: 1.8em;
             font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 20px;
         }
-        .list-group-item {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+        .carousel-card p {
+            font-size: 1.2em;
+            font-weight: 300;
         }
-        .list-group-item:hover {
-            background-color: #f1f3f5;
-            transform: scale(1.02);
-        }
-        .list-group-item a {
+        .carousel-card a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
             text-decoration: none;
-            color: #495057;
-            font-size: 1.1em;
+            transition: background-color 0.3s ease;
         }
-        .list-group-item a:hover {
-            color: #007bff;
+        .carousel-card a:hover {
+            background-color: #0056b3;
         }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            background-color: #ffffff;
+        .carousel-inner {
+            padding: 40px;
         }
-        .card-body {
-            padding: 20px;
+        .carousel-control-prev, .carousel-control-next {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+        }
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            filter: invert(100%);
+        }
+        .carousel-caption {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 3.5em;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -286,28 +310,70 @@ $conn->close();
                     </ol>
                 </nav>
 
-                <h2>Menú de <?php echo htmlspecialchars($nombre_usuario); ?></h2>
+                <!-- Carrusel con la frase "Menú de <?php echo htmlspecialchars($nombre_usuario); ?>" -->
+                <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <!-- Primera tarjeta del carrusel -->
+                        <div class="carousel-item active">
+                            <div class="carousel-card">
+                                <div class="carousel-caption">
+                                    🧑‍💻 Menú de <?php echo htmlspecialchars($nombre_usuario); ?> 
+                                </div>
+                            </div>
+                        </div>
 
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <i class="fa fa-book mr-2"></i>
-                        <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=materia">Materias</a>
-                    </li>
-                    <li class="list-group-item">
-                        <i class="fa fa-gamepad mr-2"></i>
-                        <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=juego">Juegos</a>
-                    </li>
-                    <li class="list-group-item">
-                        <i class="fa fa-cogs mr-2"></i>
-                        <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=proyecto">Proyectos</a>
-                    </li>
-                </ul>
+                        <!-- Tarjeta de Materias -->
+                        <div class="carousel-item">
+                            <div class="card carousel-card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">📚 Materias</h5>
+                                    <p class="card-text">Accede a las materias disponibles y mejora tus conocimientos. 🧠</p>
+                                    <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=materia">Ver Materias</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Juegos -->
+                        <div class="carousel-item">
+                            <div class="card carousel-card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">🎮 Juegos</h5>
+                                    <p class="card-text">Juega y aprende con nuestros juegos interactivos. 🕹️</p>
+                                    <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=juego">Ver Juegos</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Proyectos -->
+                        <div class="carousel-item">
+                            <div class="card carousel-card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">🔨 Proyectos</h5>
+                                    <p class="card-text">Participa en proyectos innovadores y desarrolla nuevas habilidades. 🚀</p>
+                                    <a href="lista_elementos.php?usuario_id=<?php echo $usuario_id; ?>&tipo=proyecto">Ver Proyectos</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- Scripts de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 </div>
             </main>
         </div>
