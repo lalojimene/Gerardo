@@ -154,26 +154,24 @@ INSERT INTO `materias` (`materia_id`, `nombre`, `descripcion`) VALUES
 	(38, 'Neurociencia', 'Estudio del sistema nervioso y el cerebro.'),
 	(39, 'Metodología de la Investigación', 'Técnicas y herramientas para la investigación científica.');
 
--- Volcando estructura para tabla gerardo_db.preguntas_secretas
-CREATE TABLE IF NOT EXISTS `preguntas_secretas` (
-  `id_pregunta` int(11) NOT NULL AUTO_INCREMENT,
+-- Volcando estructura para tabla gerardo_db.preguntas_secreta
+CREATE TABLE IF NOT EXISTS `preguntas_secreta` (
+  `pregunta_id` int(11) NOT NULL AUTO_INCREMENT,
   `pregunta` varchar(255) NOT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_pregunta`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  PRIMARY KEY (`pregunta_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla gerardo_db.preguntas_secretas: ~10 rows (aproximadamente)
-INSERT INTO `preguntas_secretas` (`id_pregunta`, `pregunta`, `fecha_creacion`) VALUES
-	(1, '¿Cuál es el nombre de tu primera mascota?', '2025-02-19 21:59:20'),
-	(2, '¿En qué ciudad naciste?', '2025-02-19 21:59:20'),
-	(3, '¿Cuál es el nombre de tu escuela primaria?', '2025-02-19 21:59:20'),
-	(4, '¿Cuál es el segundo nombre de tu madre?', '2025-02-19 21:59:20'),
-	(5, '¿Cómo se llamaba tu primer mejor amigo?', '2025-02-19 21:59:20'),
-	(6, '¿Cuál fue tu primer trabajo?', '2025-02-19 21:59:20'),
-	(7, '¿Cuál es tu comida favorita?', '2025-02-19 21:59:20'),
-	(8, '¿Cuál es el nombre de tu canción favorita?', '2025-02-19 21:59:20'),
-	(9, '¿Cómo se llama tu héroe de la infancia?', '2025-02-19 21:59:20'),
-	(10, '¿Cuál es el apellido de soltera de tu madre?', '2025-02-19 21:59:20');
+-- Volcando datos para la tabla gerardo_db.preguntas_secreta: ~8 rows (aproximadamente)
+INSERT INTO `preguntas_secreta` (`pregunta_id`, `pregunta`, `fecha_creacion`) VALUES
+	(1, '¿Cuál es el nombre de tu primera mascota?', '2025-02-20 09:40:22'),
+	(2, '¿En qué ciudad naciste?', '2025-02-20 09:40:22'),
+	(3, '¿Cuál es el nombre de tu escuela primaria?', '2025-02-20 09:40:22'),
+	(4, '¿Cuál es el segundo nombre de tu madre?', '2025-02-20 09:40:22'),
+	(5, '¿Cómo se llamaba tu primer mejor amigo?', '2025-02-20 09:40:22'),
+	(6, '¿Cuál fue tu primer trabajo?', '2025-02-20 09:40:22'),
+	(7, '¿Cuál es tu comida favorita?', '2025-02-20 09:40:22'),
+	(8, '¿Cuál es el nombre de tu canción favorita?', '2025-02-20 09:40:22');
 
 -- Volcando estructura para tabla gerardo_db.proyectos
 CREATE TABLE IF NOT EXISTS `proyectos` (
@@ -216,28 +214,33 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `nombre` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `celular` varchar(10) NOT NULL,
+  `celular` varchar(15) NOT NULL,
   `pregunta1` int(11) NOT NULL,
   `respuesta1` varchar(255) NOT NULL,
   `pregunta2` int(11) NOT NULL,
   `respuesta2` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` enum('admin','usuario') DEFAULT 'usuario',
+  `rol` enum('usuario','admin') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `token` varchar(255) DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`usuario_id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  KEY `pregunta1` (`pregunta1`),
+  KEY `pregunta2` (`pregunta2`),
+  CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`pregunta1`) REFERENCES `preguntas_secreta` (`pregunta_id`),
+  CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`pregunta2`) REFERENCES `preguntas_secreta` (`pregunta_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla gerardo_db.usuarios: ~6 rows (aproximadamente)
-INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`) VALUES
-	(1, 'Gerardo', '', 'gerardo@example.com', '', 0, '', 0, '', '$2y$10$ucRuDS/dG4chrvgisWj/VOg1vtK7czahzAAWKtJGCNpUOMoyJkdg2', 'usuario', '2025-02-10 11:49:41', NULL, NULL),
-	(2, 'Josue', '', 'josue@example.com', '', 0, '', 0, '', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-10 11:49:41', NULL, NULL),
-	(3, 'Alexis', '', 'alexis@example.com', '', 0, '', 0, '', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-10 11:49:42', NULL, NULL),
-	(4, 'Yahir', '', 'yahir@example.com', '', 0, '', 0, '', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-10 11:49:42', NULL, NULL),
-	(5, 'Wilber', '', 'wilber@example.com', '', 0, '', 0, '', '$2y$10$QFiLpCVrD3JdyuCJ1g1P3ehMo7DgfeX0kg/gSXjQdcpWq/Aox8LA6', 'admin', '2025-02-10 11:49:42', NULL, NULL),
-	(13, 'Gerardo', 'JimÃ©nez velasco', 'gerardojimenezvelaco20@gmail.com', '9191311350', 1, 'chispo', 5, 'chayo', '$2y$10$Bll5emDngnhl4coL1nQ7u.J6JxX1ad3l2pCJ/5gCMrfFHrfKS9sbi', 'usuario', '2025-02-20 07:39:31', NULL, NULL);
+-- Volcando datos para la tabla gerardo_db.usuarios: ~7 rows (aproximadamente)
+INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`, `fecha_registro`) VALUES
+	(1, 'Gerardo', 'Pérez García', 'gerardo@example.com', '9192393081', 1, 'chispo', 5, 'chayo', '$2y$10$nvD/q1sjRs58CT70qplMrObnBYk4bLkedP6c3NLljHFwTFg5SUV.S', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
+	(2, 'Josue', 'López Sánchez', 'josue@example.com', '9191311351', 1, 'chispo', 5, 'chayo', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
+	(3, 'Alexis', 'Martínez Ruiz', 'alexis@example.com', '9191311352', 1, 'chispo', 5, 'chayo', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
+	(4, 'Yahir', 'Vega Pérez', 'yahir@example.com', '9191311353', 1, 'chispo', 5, 'chayo', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
+	(5, 'Wilber', 'Ramírez Sánchez', 'wilber@example.com', '9192393083', 1, 'chispo', 5, 'chayo', '$2y$10$QFiLpCVrD3JdyuCJ1g1P3ehMo7DgfeX0kg/gSXjQdcpWq/Aox8LA6', 'admin', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
+	(14, 'Gerardo', 'Velasco', 'gerardojimenezvelaco20@gmail.com', '9191311359', 1, 'chispo', 5, 'chayo', '$2y$10$SMUJb3p6Rd/hemx1R3UYl.wVg3yMgw5s3zZxVXpKKwluWiyWWg8OS', 'usuario', '2025-02-20 11:27:01', NULL, NULL, '2025-02-23 08:13:19'),
+	(15, 'Gerardo', 'Jiménez velasco', 'gerardojimenezvelaco49@gmail.com', '9191311350', 1, 'chispo', 5, 'chayo', '$2y$10$N7MqmTi3ukmOuTNy3pxK.ujtWKDsV9t9CzgmA3Cy6gciRH8EO7ZqO', 'usuario', '2025-02-20 23:47:42', '539327', '2025-02-23 09:10:35', '2025-02-23 08:13:19');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
