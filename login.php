@@ -29,7 +29,7 @@
                     </form>
 
                     <p class="mt-3 text-center">
-                        <a href="recuperar_contraseña.php">¿Olvidaste tu contraseña?</a>
+                        <a href="opciones_recuperacion.php">¿Olvidaste tu contraseña?</a>
                     </p>
                     
                     <p class="mt-3 text-center">

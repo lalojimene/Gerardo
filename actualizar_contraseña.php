@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Verificar si el token sigue siendo válido
-    $stmt = $conn->prepare("SELECT id FROM usuarios WHERE token = ? AND token_expira > NOW()");
+    $stmt = $conn->prepare("SELECT usuario_id FROM usuarios WHERE token = ? AND token_expira > NOW()");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $stmt->store_result();
@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         // Actualizar la contraseña y eliminar el token
-        $stmt = $conn->prepare("UPDATE usuarios SET password = ?, token = NULL, token_expira = NULL WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE usuarios SET password = ?, token = NULL, token_expira = NULL WHERE usuario_id = ?");
         $stmt->bind_param("si", $password, $id);
         $stmt->execute();
 

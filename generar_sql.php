@@ -15,20 +15,20 @@ if ($conn->connect_error) {
 
 // Lista de usuarios
 $usuarios = [
-    ['nombre' => 'Gerardo', 'email' => 'gerardo@example.com', 'password' => 'clave123', 'rol' => 'usuario'],
-    ['nombre' => 'Josue', 'email' => 'josue@example.com', 'password' => 'seguro456', 'rol' => 'usuario'],
-    ['nombre' => 'Alexis', 'email' => 'alexis@example.com', 'password' => 'pass789', 'rol' => 'usuario'],
-    ['nombre' => 'Yahir', 'email' => 'yahir@example.com', 'password' => 'yahir2024', 'rol' => 'usuario'],
-    ['nombre' => 'Wilber', 'email' => 'wilber@example.com', 'password' => 'admin999', 'rol' => 'admin'],
+    ['usuario_id' => 6, 'nombre' => 'Gerardo', 'apellidos' => 'Pérez García', 'email' => 'gerardoperez@example.com', 'celular' => '9192049623', 'pregunta1' => 1, 'respuesta1' => 'chispo', 'pregunta2' => 5, 'respuesta2' => 'chayo', 'rol' => 'usuario'],
+    ['usuario_id' => 7, 'nombre' => 'Josue', 'apellidos' => 'López Sánchez', 'email' => 'josuelopez@example.com', 'celular' => '9192049623', 'pregunta1' => 1, 'respuesta1' => 'chispo', 'pregunta2' => 5, 'respuesta2' => 'chayo', 'rol' => 'usuario'],
+    ['usuario_id' => 8, 'nombre' => 'Alexis', 'apellidos' => 'Martínez Ruiz', 'email' => 'alexismartinez@example.com', 'celular' => '9192049623', 'pregunta1' => 1, 'respuesta1' => 'chispo', 'pregunta2' => 5, 'respuesta2' => 'chayo', 'rol' => 'usuario'],
+    ['usuario_id' => 9, 'nombre' => 'Yahir', 'apellidos' => 'Vega Pérez', 'email' => 'yahirvega@example.com', 'celular' => '9192049623', 'pregunta1' => 1, 'respuesta1' => 'chispo', 'pregunta2' => 5, 'respuesta2' => 'chayo', 'rol' => 'usuario'],
+    ['usuario_id' => 10, 'nombre' => 'Wilber', 'apellidos' => 'Ramírez Sánchez', 'email' => 'wilberramirez@example.com', 'celular' => '9192049623', 'pregunta1' => 1, 'respuesta1' => 'chispo', 'pregunta2' => 5, 'respuesta2' => 'chayo', 'rol' => 'admin'],
 ];
 
 foreach ($usuarios as $usuario) {
-    // Cifrar la contraseña
-    $hashedPassword = password_hash($usuario['password'], PASSWORD_DEFAULT);
+    // Cifrar la contraseña 'qwerty' para todos los usuarios
+    $hashedPassword = password_hash('qwerty', PASSWORD_DEFAULT);
     
     // Preparar la consulta SQL para insertar el usuario
-    $sql = "INSERT INTO `usuarios` (`nombre`, `email`, `password`, `rol`, `created_at`) 
-            VALUES ('" . $usuario['nombre'] . "', '" . $usuario['email'] . "', '" . $hashedPassword . "', '" . $usuario['rol'] . "', NOW())";
+    $sql = "INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`) 
+            VALUES ('" . $usuario['usuario_id'] . "', '" . $usuario['nombre'] . "', '" . $usuario['apellidos'] . "', '" . $usuario['email'] . "', '" . $usuario['celular'] . "', " . $usuario['pregunta1'] . ", '" . $usuario['respuesta1'] . "', " . $usuario['pregunta2'] . ", '" . $usuario['respuesta2'] . "', '" . $hashedPassword . "', '" . $usuario['rol'] . "', NOW(), NULL, NULL)";
 
     // Ejecutar la consulta SQL
     if ($conn->query($sql) === TRUE) {
