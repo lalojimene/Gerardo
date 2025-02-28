@@ -172,160 +172,16 @@ $conn->close();
         <!-- Contenido principal -->
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid"><?php
-
-
-// Verificar si el usuario ha iniciado sesión
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// Conectar a la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "gerardo_db";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-$conn->set_charset("utf8mb4");
-
-// Obtener datos del usuario
-$sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE nombre = ?";
-$stmtUsuario = $conn->prepare($sqlUsuario);
-$stmtUsuario->bind_param("s", $_SESSION['usuario']);
-$stmtUsuario->execute();
-$resultUsuario = $stmtUsuario->get_result();
-$usuarioActual = $resultUsuario->fetch_assoc();
-$usuarioRol = $usuarioActual['rol'];
-
-$stmtUsuario->close();
-$conn->close();
-?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Búsqueda con Scroll Infinito</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script>
-        let offset = 0;
-        const limit = 3;
-        let loading = false;
-        let allLoaded = false;
-
-        function loadResults() {
-            if (loading || allLoaded) return;
-            loading = true;
-            document.getElementById('loading').style.display = "block"; // Mostrar "Cargando..."
-
-            setTimeout(() => { // Espera 5 segundos antes de cargar los datos
-                let search = document.getElementById('search').value;
-                let categoria = document.getElementById('categoria').value;
-                let resultsDiv = document.getElementById('results');
-
-                fetch(`buscar.php?search=${encodeURIComponent(search)}&categoria=${encodeURIComponent(categoria)}&offset=${offset}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('loading').style.display = "none"; // Ocultar "Cargando..."
-
-                    if (data.length > 0) {
-                        data.forEach(item => {
-                            let div = document.createElement('div');
-                            div.classList.add('col-md-4', 'mb-4');
-                            div.innerHTML = `
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${item.nombre}</h5>
-                                        <p class="card-text">${item.descripcion.substring(0, 100)}...</p>
-                                        <a href="descripcion.php?id=${item.id}&tipo=${item.tipo}" class="btn btn-primary">Ver más</a>
-                                    </div>
-                                </div>
-                            `;
-                            resultsDiv.appendChild(div);
-                        });
-                        offset += limit;
-                    } else {
-                        allLoaded = true; // No hay más datos
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('loading').style.display = "none";
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    loading = false;
-                });
-            }, 5000); // ⏳ Retraso de 5 segundos antes de cargar los resultados
-        }
-
-        function resetSearch() {
-            offset = 0;
-            allLoaded = false;
-            document.getElementById('results').innerHTML = "";
-            loadResults();
-        }
-
-        window.addEventListener('scroll', function() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-                loadResults();
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            loadResults();
-        });
-    </script>
-</head>
-<body>
-<div class="container mt-4">
-    <h2 class="text-center">Búsqueda con Scroll Infinito</h2>
-
-    <!-- Formulario de Búsqueda -->
-    <div class="card p-3 mb-4">
-        <form onsubmit="event.preventDefault(); resetSearch();">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label for="categoria" class="form-label">Seleccione Categoría</label>
-                    <select class="form-select" id="categoria">
-                        <option value="todas" selected>Todas</option>
-                        <option value="materias">Materias</option>
-                        <option value="juegos">Juegos</option>
-                        <option value="proyectos">Proyectos</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="search" class="form-label">Buscar por Nombre o Descripción</label>
-                    <input type="text" class="form-control" id="search" placeholder="Ingrese nombre o descripción">
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <button type="submit" class="btn btn-primary mt-4">Buscar</button>
-                </div>
-            </div>
-        </form>
+                <div class="container-fluid">
+                <main>
+    <div class="container-fluid">
+        <h1 class="mt-4">Bienvenido al Sistema Web</h1>
+        <div class="text-center mt-4">
+            <a href="buscador.php" class="btn btn-primary">Buscador</a>
+        </div>
     </div>
-
-    <!-- Resultados -->
-    <div class="row" id="results"></div>
-
-    <!-- Cargando -->
-    <div id="loading" class="text-center" style="display: none;">
-        <p class="text-primary">Cargando...</p>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-
 </main>
+
         </div>
     </div>
 

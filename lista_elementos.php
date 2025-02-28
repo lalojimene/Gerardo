@@ -246,7 +246,7 @@ $conn->close();
             background-color: #f4f6f9;
         }
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin-top: 30px;
         }
         .breadcrumb {
@@ -267,32 +267,31 @@ $conn->close();
             margin-top: 20px;
             margin-bottom: 20px;
         }
-        .list-group-item {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .list-group-item:hover {
-            background-color: #f1f3f5;
-            transform: scale(1.02);
-        }
-        .list-group-item a {
-            text-decoration: none;
-            color: #495057;
-            font-size: 1.1em;
-        }
-        .list-group-item a:hover {
-            color: #007bff;
-        }
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            background-color: #ffffff;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.03);
         }
         .card-body {
             padding: 20px;
+        }
+        .card-title {
+            font-size: 1.25em;
+            color: #495057;
+        }
+        .card-text {
+            color: #6c757d;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
         }
     </style>
 </head>
@@ -312,9 +311,9 @@ $conn->close();
 
                 <h2><?php echo $titulo; ?> de <?php echo htmlspecialchars($nombre_usuario); ?></h2>
 
-                <ul class="list-group" id="lista-elementos">
-                    <!-- Los elementos se cargarán aquí -->
-                </ul>
+                <div class="row g-4" id="lista-elementos">
+                    <!-- Las tarjetas se cargarán aquí -->
+                </div>
 
             </div>
         </div>
@@ -346,13 +345,21 @@ $conn->close();
                     return;
                 }
 
-                // Crear los elementos de la lista
+                // Crear las tarjetas en filas de tres
                 listaElementos.innerHTML = "";
                 data.elementos.forEach(item => {
-                    const li = document.createElement('li');
-                    li.classList.add('list-group-item');
-                    li.innerHTML = `<a href="descripcion.php?id=${item.id}&tipo=${tipo}">${item.nombre}</a>`;
-                    listaElementos.appendChild(li);
+                    const col = document.createElement('div');
+                    col.classList.add('col-md-4');
+                    col.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${item.nombre}</h5>
+                                <p class="card-text">Descripción breve del ${tipo}.</p>
+                                <a href="descripcion.php?id=${item.id}&tipo=${tipo}" class="btn btn-primary">Ver más</a>
+                            </div>
+                        </div>
+                    `;
+                    listaElementos.appendChild(col);
                 });
             } catch (error) {
                 console.error('Error en la solicitud:', error);
@@ -364,8 +371,10 @@ $conn->close();
         window.onload = cargarElementos;
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 
 </main>
         </div>

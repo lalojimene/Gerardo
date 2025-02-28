@@ -225,6 +225,9 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `token` varchar(255) DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `secret` varchar(255) DEFAULT NULL,
+  `token_mfa` varchar(100) DEFAULT NULL,
+  `token_mfa_expira` datetime DEFAULT NULL,
   PRIMARY KEY (`usuario_id`),
   KEY `pregunta1` (`pregunta1`),
   KEY `pregunta2` (`pregunta2`),
@@ -232,15 +235,13 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`pregunta2`) REFERENCES `preguntas_secreta` (`pregunta_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla gerardo_db.usuarios: ~7 rows (aproximadamente)
-INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`, `fecha_registro`) VALUES
-	(1, 'Gerardo', 'Pérez García', 'gerardo@example.com', '9192393081', 1, 'chispo', 5, 'chayo', '$2y$10$nvD/q1sjRs58CT70qplMrObnBYk4bLkedP6c3NLljHFwTFg5SUV.S', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
-	(2, 'Josue', 'López Sánchez', 'josue@example.com', '9191311351', 1, 'chispo', 5, 'chayo', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
-	(3, 'Alexis', 'Martínez Ruiz', 'alexis@example.com', '9191311352', 1, 'chispo', 5, 'chayo', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
-	(4, 'Yahir', 'Vega Pérez', 'yahir@example.com', '9191311353', 1, 'chispo', 5, 'chayo', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
-	(5, 'Wilber', 'Ramírez Sánchez', 'wilber@example.com', '9192393083', 1, 'chispo', 5, 'chayo', '$2y$10$QFiLpCVrD3JdyuCJ1g1P3ehMo7DgfeX0kg/gSXjQdcpWq/Aox8LA6', 'admin', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19'),
-	(14, 'Gerardo', 'Velasco', 'gerardojimenezvelaco20@gmail.com', '9191311359', 1, 'chispo', 5, 'chayo', '$2y$10$SMUJb3p6Rd/hemx1R3UYl.wVg3yMgw5s3zZxVXpKKwluWiyWWg8OS', 'usuario', '2025-02-20 11:27:01', NULL, NULL, '2025-02-23 08:13:19'),
-	(15, 'Gerardo', 'Jiménez velasco', 'gerardojimenezvelaco49@gmail.com', '9191311350', 1, 'chispo', 5, 'chayo', '$2y$10$N7MqmTi3ukmOuTNy3pxK.ujtWKDsV9t9CzgmA3Cy6gciRH8EO7ZqO', 'usuario', '2025-02-20 23:47:42', '539327', '2025-02-23 09:10:35', '2025-02-23 08:13:19');
+-- Volcando datos para la tabla gerardo_db.usuarios: ~5 rows (aproximadamente)
+INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`, `fecha_registro`, `secret`, `token_mfa`, `token_mfa_expira`) VALUES
+	(1, 'Gerardo', 'Pérez García', 'gerardo@example.com', '9192393081', 1, 'chispo', 5, 'chayo', '$2y$10$DcBIZO2ZMHxh28L.Ziox5e85T0eWIocUxE4zZL8ru1chSP.3RpcXe', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', 'CG5BHGS76DIMYRIY', 'f98cae956bf6e575903fa3e37983fbf307cec9767f73c9db50d0e7565576ceca758757588944c4bc5482b17cf06a51501e9a', '2025-02-28 13:57:55'),
+	(2, 'Josue', 'López Sánchez', 'josue@example.com', '9191311351', 1, 'chispo', 5, 'chayo', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(3, 'Alexis', 'Martínez Ruiz', 'alexis@example.com', '9191311352', 1, 'chispo', 5, 'chayo', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(4, 'Yahir', 'Vega Pérez', 'yahir@example.com', '9191311353', 1, 'chispo', 5, 'chayo', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(5, 'Wilber', 'Ramírez Sánchez', 'wilber@example.com', '9192393083', 1, 'chispo', 5, 'chayo', '$2y$10$QFiLpCVrD3JdyuCJ1g1P3ehMo7DgfeX0kg/gSXjQdcpWq/Aox8LA6', 'admin', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', 'J6VFB22EER6GABHW', NULL, NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
