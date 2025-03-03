@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
+-- Versión del servidor:         8.0.30 - MySQL Community Server - GPL
 -- SO del servidor:              Win64
 -- HeidiSQL Versión:             12.7.0.6850
 -- --------------------------------------------------------
@@ -16,16 +16,16 @@
 
 
 -- Volcando estructura de base de datos para gerardo_db
-CREATE DATABASE IF NOT EXISTS `gerardo_db` /*!40100 DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci */;
+CREATE DATABASE IF NOT EXISTS `gerardo_db` /*!40100 DEFAULT CHARACTER SET latin1 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `gerardo_db`;
 
 -- Volcando estructura para tabla gerardo_db.accesos
 CREATE TABLE IF NOT EXISTS `accesos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `usuario_id` int(11) DEFAULT NULL,
-  `materia_id` int(11) DEFAULT NULL,
-  `juego_id` int(11) DEFAULT NULL,
-  `proyecto_id` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int DEFAULT NULL,
+  `materia_id` int DEFAULT NULL,
+  `juego_id` int DEFAULT NULL,
+  `proyecto_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   KEY `materia_id` (`materia_id`),
@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS `accesos` (
   CONSTRAINT `accesos_ibfk_2` FOREIGN KEY (`materia_id`) REFERENCES `materias` (`materia_id`),
   CONSTRAINT `accesos_ibfk_3` FOREIGN KEY (`juego_id`) REFERENCES `juegos` (`juego_id`),
   CONSTRAINT `accesos_ibfk_4` FOREIGN KEY (`proyecto_id`) REFERENCES `proyectos` (`proyecto_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
 
--- Volcando datos para la tabla gerardo_db.accesos: ~44 rows (aproximadamente)
+-- Volcando datos para la tabla gerardo_db.accesos: ~7 rows (aproximadamente)
 INSERT INTO `accesos` (`id`, `usuario_id`, `materia_id`, `juego_id`, `proyecto_id`) VALUES
 	(1, 1, 1, 2, 1),
 	(2, 2, 2, 3, 2),
@@ -86,9 +86,9 @@ INSERT INTO `accesos` (`id`, `usuario_id`, `materia_id`, `juego_id`, `proyecto_i
 
 -- Volcando estructura para tabla gerardo_db.juegos
 CREATE TABLE IF NOT EXISTS `juegos` (
-  `juego_id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` text DEFAULT NULL,
+  `juego_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`juego_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -121,9 +121,9 @@ INSERT INTO `juegos` (`juego_id`, `nombre`, `descripcion`) VALUES
 
 -- Volcando estructura para tabla gerardo_db.materias
 CREATE TABLE IF NOT EXISTS `materias` (
-  `materia_id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` mediumtext DEFAULT NULL,
+  `materia_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` mediumtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`materia_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -156,11 +156,11 @@ INSERT INTO `materias` (`materia_id`, `nombre`, `descripcion`) VALUES
 
 -- Volcando estructura para tabla gerardo_db.preguntas_secreta
 CREATE TABLE IF NOT EXISTS `preguntas_secreta` (
-  `pregunta_id` int(11) NOT NULL AUTO_INCREMENT,
+  `pregunta_id` int NOT NULL AUTO_INCREMENT,
   `pregunta` varchar(255) NOT NULL,
-  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`pregunta_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla gerardo_db.preguntas_secreta: ~8 rows (aproximadamente)
 INSERT INTO `preguntas_secreta` (`pregunta_id`, `pregunta`, `fecha_creacion`) VALUES
@@ -175,13 +175,13 @@ INSERT INTO `preguntas_secreta` (`pregunta_id`, `pregunta`, `fecha_creacion`) VA
 
 -- Volcando estructura para tabla gerardo_db.proyectos
 CREATE TABLE IF NOT EXISTS `proyectos` (
-  `proyecto_id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` mediumtext DEFAULT NULL,
+  `proyecto_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` mediumtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`proyecto_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla gerardo_db.proyectos: ~24 rows (aproximadamente)
+-- Volcando datos para la tabla gerardo_db.proyectos: ~0 rows (aproximadamente)
 INSERT INTO `proyectos` (`proyecto_id`, `nombre`, `descripcion`) VALUES
 	(1, 'Proyecto de Investigación', 'Desarrolla habilidades de investigación a través de proyectos educativos.'),
 	(2, 'Proyecto de Biología', 'Aprende sobre la vida y los seres vivos a través de proyectos interactivos.'),
@@ -210,21 +210,21 @@ INSERT INTO `proyectos` (`proyecto_id`, `nombre`, `descripcion`) VALUES
 
 -- Volcando estructura para tabla gerardo_db.usuarios
 CREATE TABLE IF NOT EXISTS `usuarios` (
-  `usuario_id` int(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `celular` varchar(15) NOT NULL,
-  `pregunta1` int(11) NOT NULL,
+  `pregunta1` int NOT NULL,
   `respuesta1` varchar(255) NOT NULL,
-  `pregunta2` int(11) NOT NULL,
+  `pregunta2` int NOT NULL,
   `respuesta2` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `rol` enum('usuario','admin') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `token` varchar(255) DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `secret` varchar(255) DEFAULT NULL,
   `token_mfa` varchar(100) DEFAULT NULL,
   `token_mfa_expira` datetime DEFAULT NULL,
@@ -233,14 +233,14 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   KEY `pregunta2` (`pregunta2`),
   CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`pregunta1`) REFERENCES `preguntas_secreta` (`pregunta_id`),
   CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`pregunta2`) REFERENCES `preguntas_secreta` (`pregunta_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla gerardo_db.usuarios: ~5 rows (aproximadamente)
 INSERT INTO `usuarios` (`usuario_id`, `nombre`, `apellidos`, `email`, `celular`, `pregunta1`, `respuesta1`, `pregunta2`, `respuesta2`, `password`, `rol`, `created_at`, `token`, `token_expira`, `fecha_registro`, `secret`, `token_mfa`, `token_mfa_expira`) VALUES
-	(1, 'Gerardo', 'Pérez García', 'gerardo@example.com', '9192393081', 1, 'chispo', 5, 'chayo', '$2y$10$DcBIZO2ZMHxh28L.Ziox5e85T0eWIocUxE4zZL8ru1chSP.3RpcXe', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', 'CG5BHGS76DIMYRIY', 'f98cae956bf6e575903fa3e37983fbf307cec9767f73c9db50d0e7565576ceca758757588944c4bc5482b17cf06a51501e9a', '2025-02-28 13:57:55'),
-	(2, 'Josue', 'López Sánchez', 'josue@example.com', '9191311351', 1, 'chispo', 5, 'chayo', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
-	(3, 'Alexis', 'Martínez Ruiz', 'alexis@example.com', '9191311352', 1, 'chispo', 5, 'chayo', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
-	(4, 'Yahir', 'Vega Pérez', 'yahir@example.com', '9191311353', 1, 'chispo', 5, 'chayo', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(1, 'Gerardo', 'Pérez García', 'gerardo@example.com', '9192393081', 1, 'chispo', 5, 'chayo', '$2y$10$DcBIZO2ZMHxh28L.Ziox5e85T0eWIocUxE4zZL8ru1chSP.3RpcXe', 'usuario', '2025-02-20 10:44:37', 'f659cdced094b9a1a69f84a59b7bd34608a9db2bcb869b3cb546669eb23d95304994c2e3a27959477553eb9fe8b99fa3000c', '2025-03-03 21:25:08', '2025-02-23 08:13:19', 'CG5BHGS76DIMYRIY', 'f98cae956bf6e575903fa3e37983fbf307cec9767f73c9db50d0e7565576ceca758757588944c4bc5482b17cf06a51501e9a', '2025-02-28 13:57:55'),
+	(2, 'Janilet', 'López Sánchez', 'janilet@example.com', '9191311351', 1, 'chispo', 5, 'chayo', '$2y$10$BdU6hk4udfZRhXvawchV0u8XyR41mYB5WdRwRII62m8h3J5G/APju', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(3, 'Cristian', 'Martínez Ruiz', 'cristian@example.com', '9191311352', 1, 'chispo', 5, 'chayo', '$2y$10$8Ii0mA6KO93L1iDyEi.7VutK7jNq5s6R1GDa9AXAJq43uUcsBtQ06', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
+	(4, 'Noemi', 'Vega Pérez', 'noemi@example.com', '9191311353', 1, 'chispo', 5, 'chayo', '$2y$10$LMNOF1IT0a7x2Dt/eJn6ye55qZnG1z0kyTni0wdcChgJYHtHGhsQG', 'usuario', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', NULL, NULL, NULL),
 	(5, 'Wilber', 'Ramírez Sánchez', 'wilber@example.com', '9192393083', 1, 'chispo', 5, 'chayo', '$2y$10$QFiLpCVrD3JdyuCJ1g1P3ehMo7DgfeX0kg/gSXjQdcpWq/Aox8LA6', 'admin', '2025-02-20 10:44:37', NULL, NULL, '2025-02-23 08:13:19', 'J6VFB22EER6GABHW', NULL, NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
