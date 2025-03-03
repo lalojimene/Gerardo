@@ -1,28 +1,29 @@
 <?php
 session_start();
-require 'conexion.php'; // Conexión a la base de datos
+require 'conexion.php';
+
+$clave_secreta = "mi_clave_secreta_super_segura";
 
 if (isset($_GET['token']) && isset($_GET['email']) && isset($_GET['nombre'])) {
     $token = $_GET['token'];
     $email = $_GET['email'];
     $nombre_usuario = $_GET['nombre'];
 
-    // Verificar si el token existe en la base de datos y no ha expirado
-    $sql = "SELECT usuario_id, nombre, token_expira FROM usuarios WHERE token = ? AND email = ?";
+    // Verificar el token en la base de datos
+    $sql = "SELECT usuario_id, nombre, rol, token_expira FROM usuarios WHERE token = ? AND email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $token, $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($row = $result->fetch_assoc()) {
-        // Verificar si el token ha expirado
         $expira = new DateTime($row['token_expira']);
         $ahora = new DateTime();
-        
+
         if ($expira > $ahora) {
-            // Mostrar formulario de verificación
+            // Mostrar el formulario de verificación
             echo "<h2>Verificación de identidad</h2>";
-            echo "<p>Nombre de usuario: <strong>$nombre_usuario</strong></p>";  // Aquí mostramos el nombre de usuario
+            echo "<p>Nombre de usuario: <strong>$nombre_usuario</strong></p>";
             echo "<form action='verify_mfa.php' method='POST'>
                     <input type='hidden' name='token' value='$token'>
                     <input type='hidden' name='email' value='$email'>
@@ -31,70 +32,56 @@ if (isset($_GET['token']) && isset($_GET['email']) && isset($_GET['nombre'])) {
                     <button type='submit' name='verify' value='no'>No, no soy yo</button>
                   </form>";
         } else {
-            echo "El enlace de verificación ha expirado. Intenta iniciar sesión de nuevo.";
+            echo "El enlace ha expirado.";
         }
     } else {
-        echo "Token inválido o ya utilizado.";
+        echo "Token inválido.";
     }
-} else {
-    echo "No se ha proporcionado un token válido.";
 }
 
 if (isset($_POST['verify'])) {
-    $token = $_POST['token'];
-    $email = $_POST['email'];
-    $nombre_usuario = $_POST['nombre'];
-
+    // Verificar si el usuario ha confirmado la verificación
     if ($_POST['verify'] == 'yes') {
-        // El usuario ha confirmado que es él
-        // Eliminar el token de la base de datos
-        $stmt = $conn->prepare("UPDATE usuarios SET token = NULL, token_expira = NULL WHERE token = ?");
-        $stmt->bind_param("s", $token);
-        $stmt->execute();
+        // Obtener el token y el email de la solicitud POST
+        $token = $_POST['token'];
+        $email = $_POST['email'];
+        $nombre_usuario = $_POST['nombre'];
 
-        // Iniciar sesión y redirigir a la página principal
-        $_SESSION['usuario'] = $nombre_usuario;  // Guardamos el nombre de usuario
-        $_SESSION['email'] = $email;
-        header("Location: principal.php");
-        exit();
+        // Obtener el usuario de la base de datos
+        $sql = "SELECT usuario_id, rol FROM usuarios WHERE email = ? AND token = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $usuario_id = $row['usuario_id'];
+            $rol = $row['rol'];
+
+            // Generar JWT manualmente
+            $header = base64_encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+            $payload = base64_encode(json_encode(['usuario_id' => $usuario_id, 'nombre' => $nombre_usuario, 'rol' => $rol, 'exp' => time() + 3600]));
+            $signature = hash_hmac('sha256', "$header.$payload", $clave_secreta, true);
+            $signature = base64_encode($signature);
+            $jwt = "$header.$payload.$signature";
+
+            // Guardar en una cookie segura HTTP-only
+            setcookie("jwt", $jwt, time() + 3600, "/", "", false, true);
+
+            // Establecer la sesión
+            $_SESSION['usuario'] = $nombre_usuario;
+            $_SESSION['rol'] = $rol;
+            $_SESSION['usuario_id'] = $usuario_id;
+
+            // Redirigir a la página principal
+            header("Location: principal.php");
+            exit();
+        } else {
+            echo "Error al verificar el usuario.";
+        }
     } else {
-        // El usuario ha rechazado la verificación
-        echo "Acceso rechazado. Si no eres tú, por favor contacta con soporte.";
+        // Si el usuario no es quien dice ser
+        echo "Verificación fallida. Acceso denegado.";
     }
 }
 ?>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        margin: 0;
-        padding: 20px;
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-    .form-container {
-        width: 50%;
-        margin: 0 auto;
-        background: white;
-        padding: 20px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    button {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    button:hover {
-        background-color: #0056b3;
-    }
-</style>

@@ -15,30 +15,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($row = $result->fetch_assoc()) {
-        // Verificar contraseña
         if (password_verify($password, $row['password'])) {
-            // Crear un token único para MFA
-            $token = bin2hex(random_bytes(50)); // Genera un token seguro
-            $expira = date("Y-m-d H:i:s", strtotime("+15 minutes")); // El token expira en 15 minutos
+            // Generar token de MFA
+            $token_mfa = bin2hex(random_bytes(50));
+            $expira = date("Y-m-d H:i:s", strtotime("+15 minutes"));
 
-            // Guardar el token en la base de datos
             $stmt = $conn->prepare("UPDATE usuarios SET token = ?, token_expira = ? WHERE email = ?");
-            $stmt->bind_param("sss", $token, $expira, $email);
+            $stmt->bind_param("sss", $token_mfa, $expira, $email);
             $stmt->execute();
 
-            // Enviar el correo con el enlace de MFA
-            $enlace = "http://localhost/sistemabd/verify_mfa.php?token=" . $token . "&email=" . urlencode($email) . "&nombre=" . urlencode($row['nombre']);
-            $asunto = "Verificación de identidad";
-            $mensaje = "Haz clic en el siguiente enlace para verificar tu identidad: $enlace";
-            $cabeceras = "From: uts@gerardo.com\r\nContent-Type: text/html;";
-
-            mail($email, $asunto, $mensaje, $cabeceras);
+            // Enviar correo con el enlace de MFA
+            $enlace = "http://localhost/sistemabd/verify_mfa.php?token=" . $token_mfa . "&email=" . urlencode($email) . "&nombre=" . urlencode($row['nombre']);
+            mail($email, "Verificación de identidad", "Haz clic en este enlace: $enlace", "From: uts@gerardo.com\r\nContent-Type: text/html;");
 
             echo "Se ha enviado un enlace de verificación a tu correo.";
-
-            // Guardar datos del usuario en sesión para la siguiente fase (MFA)
-            $_SESSION['usuario'] = $row['nombre'];
-            $_SESSION['rol'] = $row['rol'];
             exit();
         } else {
             echo "<script>alert('Contraseña incorrecta'); window.location='login.php';</script>";
