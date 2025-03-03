@@ -1,11 +1,52 @@
 <?php
 session_start();
 
-// Verificar si el usuario ha iniciado sesión
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
+// Clave secreta para verificar el JWT
+$clave_secreta = "mi_clave_secreta_super_segura";
+
+// Verificar si existe la cookie con el JWT
+if (!isset($_COOKIE['jwt'])) {
+    session_destroy();
+    header("Location: login.php?expired=1");
     exit();
 }
+
+// Decodificar el JWT
+$jwt = $_COOKIE['jwt'];
+$partes = explode('.', $jwt);
+
+if (count($partes) !== 3) {
+    setcookie("jwt", "", time() - 3600, "/");
+    session_destroy();
+    header("Location: login.php?expired=1");
+    exit();
+}
+
+// Decodificar el header y payload
+$header = json_decode(base64_decode($partes[0]), true);
+$datos = json_decode(base64_decode($partes[1]), true);
+$signature_check = base64_encode(hash_hmac('sha256', "$partes[0].$partes[1]", $clave_secreta, true));
+
+// Verificar firma
+if ($signature_check !== $partes[2]) {
+    setcookie("jwt", "", time() - 3600, "/");
+    session_destroy();
+    header("Location: login.php?expired=1");
+    exit();
+}
+
+// Verificar expiración del token (3 minutos = 180 segundos)
+if ($datos['exp'] < time()) {
+    setcookie("jwt", "", time() - 3600, "/");
+    session_destroy();
+    header("Location: login.php?expired=1");
+    exit();
+}
+
+// Obtener información del usuario desde el JWT
+$usuario_id = $datos['usuario_id'];
+$nombre_usuario = $datos['nombre'];
+$usuarioRol = $datos['rol'];
 
 // Conectar a la base de datos
 $servername = "localhost";
@@ -18,11 +59,22 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 $conn->set_charset("utf8mb4");
-// Obtener los datos del usuario actual
-$sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE nombre = '" . $_SESSION['usuario'] . "' LIMIT 1";
-$resultUsuario = $conn->query($sqlUsuario);
+
+// ✅ Obtener los datos del usuario autenticado
+$sqlUsuario = "SELECT usuario_id, nombre, rol FROM usuarios WHERE usuario_id = ?";
+$stmtUsuario = $conn->prepare($sqlUsuario);
+$stmtUsuario->bind_param("i", $usuario_id);
+$stmtUsuario->execute();
+$resultUsuario = $stmtUsuario->get_result();
 $usuarioActual = $resultUsuario->fetch_assoc();
-$usuarioRol = $usuarioActual['rol'];
+
+// Si no se encuentra el usuario, cerrar sesión y redirigir
+if (!$usuarioActual) {
+    setcookie("jwt", "", time() - 3600, "/");
+    session_destroy();
+    header("Location: login.php?error=usuario_no_encontrado");
+    exit();
+}
 
 // Obtener todos los usuarios con rol 'usuario'
 $sqlUsuarios = "SELECT usuario_id, nombre FROM usuarios WHERE rol = 'usuario'";
@@ -39,8 +91,11 @@ while ($usuario = $resultUsuarios->fetch_assoc()) {
         LEFT JOIN materias m ON a.materia_id = m.materia_id
         LEFT JOIN juegos j ON a.juego_id = j.juego_id
         LEFT JOIN proyectos p ON a.proyecto_id = p.proyecto_id
-        WHERE a.usuario_id = " . $usuario['usuario_id'];
-    $resultAccesos = $conn->query($sqlAccesos);
+        WHERE a.usuario_id = ?";
+    $stmtAccesos = $conn->prepare($sqlAccesos);
+    $stmtAccesos->bind_param("i", $usuario['usuario_id']);
+    $stmtAccesos->execute();
+    $resultAccesos = $stmtAccesos->get_result();
 
     $accesos = [];
     while ($row = $resultAccesos->fetch_assoc()) {
@@ -55,6 +110,28 @@ while ($usuario = $resultUsuarios->fetch_assoc()) {
 
 $conn->close();
 ?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+
+    <script>
+        // 🔥 Cerrar sesión automáticamente después de 3 minutos (180,000 ms)
+        setTimeout(function () {
+            alert("Tu sesión ha expirado. Serás redirigido al inicio de sesión.");
+            window.location.href = "logout.php";
+        }, 60000); // 3 minutos en milisegundos
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
+
+
 
 <!DOCTYPE html>
 <html lang="es">
