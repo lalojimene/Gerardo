@@ -1,14 +1,13 @@
 <?php
 session_start();
 require 'conexion.php';
-require 'config.php'; // Configuración para conexión y envío de correos
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Verificar si el correo existe en la base de datos
-    $sql = "SELECT usuario_id, nombre, password, rol FROM usuarios WHERE email = ?";
+    // Buscar usuario
+    $sql = "SELECT usuario_id, nombre, password, rol, sesion_token FROM usuarios WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -16,19 +15,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($row = $result->fetch_assoc()) {
         if (password_verify($password, $row['password'])) {
-            // Generar token de MFA
-            $token_mfa = bin2hex(random_bytes(50));
-            $expira = date("Y-m-d H:i:s", strtotime("+15 minutes"));
+            $nuevo_token = bin2hex(random_bytes(32));
 
-            $stmt = $conn->prepare("UPDATE usuarios SET token = ?, token_expira = ? WHERE email = ?");
-            $stmt->bind_param("sss", $token_mfa, $expira, $email);
-            $stmt->execute();
+            // Si ya tiene una sesión activa, redirigir a verificar_sesion.php
+            if (!empty($row['sesion_token'])) {
+                $_SESSION['pending_user'] = [
+                    'usuario_id' => $row['usuario_id'],
+                    'nombre' => $row['nombre'],
+                    'rol' => $row['rol'],
+                    'nuevo_token' => $nuevo_token
+                ];
+                header("Location: verificar_sesion.php");
+                exit();
+            }
 
-            // Enviar correo con el enlace de MFA
-            $enlace = "http://localhost/sistemabd/verify_mfa.php?token=" . $token_mfa . "&email=" . urlencode($email) . "&nombre=" . urlencode($row['nombre']);
-            mail($email, "Verificación de identidad", "Haz clic en este enlace: $enlace", "From: uts@gerardo.com\r\nContent-Type: text/html;");
+            // Iniciar sesión normalmente
+            $_SESSION['usuario'] = $row['nombre'];
+            $_SESSION['rol'] = $row['rol'];
+            $_SESSION['sesion_token'] = $nuevo_token;
 
-            echo "Se ha enviado un enlace de verificación a tu correo.";
+            // Guardar el nuevo token en la base de datos
+            $sqlUpdate = "UPDATE usuarios SET sesion_token = ? WHERE usuario_id = ?";
+            $stmtUpdate = $conn->prepare($sqlUpdate);
+            $stmtUpdate->bind_param("si", $nuevo_token, $row['usuario_id']);
+            $stmtUpdate->execute();
+
+            header("Location: principal.php");
             exit();
         } else {
             echo "<script>alert('Contraseña incorrecta'); window.location='login.php';</script>";

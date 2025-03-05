@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+if (isset($_GET['session_conflict'])) {
+    echo "<script>alert('Ya tienes una sesión activa en otro dispositivo. Se ha cerrado automáticamente.');</script>";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
